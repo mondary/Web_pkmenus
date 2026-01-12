@@ -1,0 +1,30 @@
+# OS files
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.project
+.settings/
+
+# Temporary files
+*.log
+tmp/
+temp/
+
+# Browser/Node related (if applicable later)
+node_modules/
+.npm/
+dist/
+build/
+
+# Project specific
+photos/
+
+# OpenSpec tool internal artifacts (if any)
+.openspec/
