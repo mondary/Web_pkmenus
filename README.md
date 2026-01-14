@@ -2,6 +2,8 @@
 
 A simple, beautiful web-based dashboard designed to be displayed on a TV screen (or tablet) to show the weekly family menu and a photo slideshow.
 
+![App icon](icon.png)
+
 ## Features
 
 - **Weekly Menu Display**: Shows meals for the week (Monday to Sunday).
