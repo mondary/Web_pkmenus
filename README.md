@@ -13,7 +13,8 @@ A simple, beautiful web-based dashboard designed to be displayed on a TV screen 
 - **Photo Slideshow**: A clean, borderless sidebar that cycles through your personal family photos.
 - **Meal Suggestions**: Displays a dashed suggestion tile for next week that updates hourly.
 - **TV-Optimized UI**: High contrast, massive typography (Bebas Neue), and full-screen layouts suitable for viewing from across a room.
-- **Single File Architecture**: All logic (HTML, CSS, JS) is contained in `index.html` for easy deployment.
+- **Remote Menu Source**: Loads menu data from `backend/menu.json` with fallback to embedded defaults.
+- **Mobile Editor PWA**: A dedicated editor UI for phones, built as a PWA, saves changes to the server.
 
 ## Setup
 
@@ -27,15 +28,19 @@ A simple, beautiful web-based dashboard designed to be displayed on a TV screen 
     Open `index.html` and edit the configuration section at the bottom of the script:
 
     ```javascript
-    // Define your weekly meals
-    const MENU = [
+    // Remote menu source (menu.json at project root)
+    const REMOTE_MENU_URL = "backend/menu.json";
+    const REMOTE_MENU_ENABLED = Boolean(REMOTE_MENU_URL);
+
+    // Default weekly meals (used as fallback)
+    const DEFAULT_MENU = [
       { day: "Lundi", title: "...", details: "..." },
       // ...
     ];
 
     // Add your photos (path relative to index.html)
     const PHOTOS = [
-      { src: "photos/photo1.jpg" }, // Captions are hidden by default for a cleaner look
+      { src: "pwa/photos/photo1.jpg" }, // Captions are hidden by default for a cleaner look
       // ...
     ];
 
@@ -48,6 +53,40 @@ A simple, beautiful web-based dashboard designed to be displayed on a TV screen 
 3.  **Run**:
     Simply open `index.html` in any modern web browser.
     *   **Tip**: Use your browser's full-screen mode (F11) for the best experience on a TV.
+
+## Remote Menu + PWA Editor
+
+### Files & Folders
+
+- `backend/menu.json`: source of truth for the TV menu.
+- `pwa/`: PWA editor (mobile UI, manifest, service worker, photos).
+- `backend/`: PHP endpoint to save the menu JSON.
+
+### Editor (mobile)
+
+1. Open `https://your-domain/pk/pkmenus/pwa/`.
+2. Edit the fields (day, title, details).
+3. Tap **Sauvegarder** to update `menu.json`.
+
+### Backend
+
+Configure the PHP endpoint in `backend/config.php`:
+
+```php
+<?php
+$MENU_PATH = __DIR__ . "/menu.json";
+$WRITE_TOKEN = ""; // Optional: set a shared secret to protect writes.
+```
+
+If you set a token, also set it in `frontend/app.js`:
+
+```js
+const WRITE_TOKEN = "your-secret";
+```
+
+### TV display
+
+The TV display loads `menu.json` on each refresh. If the file is missing or invalid, it falls back to the embedded default menu.
 
 ## Technical Details
 

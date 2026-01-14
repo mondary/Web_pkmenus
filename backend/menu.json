@@ -1,0 +1,37 @@
+[
+  {
+    "day": "Lundi",
+    "title": "Tagliatelles aux boulettes",
+    "image": ""
+  },
+  {
+    "day": "Mardi",
+    "title": "Fajitas",
+    "image": ""
+  },
+  {
+    "day": "Mercredi",
+    "title": "Gnocchis",
+    "image": ""
+  },
+  {
+    "day": "Jeudi",
+    "title": "Poisson pane",
+    "image": ""
+  },
+  {
+    "day": "Vendredi",
+    "title": "Pizza",
+    "image": ""
+  },
+  {
+    "day": "Samedi",
+    "title": "Burgers maison",
+    "image": ""
+  },
+  {
+    "day": "Dimanche",
+    "title": "Cuisses de poulet roties",
+    "image": ""
+  }
+]

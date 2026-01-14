@@ -1,0 +1,221 @@
+:root{
+  --sun:#f3c04f;
+  --sun-deep:#d98f17;
+  --ink:#201a12;
+  --night:#120f0b;
+  --sand:#f7f1e3;
+  --paper:#fff8ee;
+  --mute:#6f6658;
+  --border:rgba(26, 19, 12, 0.08);
+  --shadow:0 16px 36px rgba(28, 18, 9, 0.16);
+  --radius:20px;
+  --card:linear-gradient(145deg, rgba(255,248,238,0.95), rgba(255,236,210,0.85));
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:"IBM Plex Sans", system-ui, sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(243,192,79,0.28), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(217,143,23,0.18), transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(255,255,255,0.7), transparent 55%),
+    var(--sand);
+}
+.app{
+  min-height:100%;
+  padding:20px 16px 32px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.top{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+  display:grid;
+  gap:16px;
+  border:1px solid rgba(255,255,255,0.6);
+}
+.title-block h1{
+  margin:6px 0 4px;
+  font-family:"Space Grotesk", sans-serif;
+  font-size:30px;
+  letter-spacing:0.6px;
+}
+.eyebrow{
+  margin:0;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--sun-deep);
+}
+.date{
+  font-family:"Space Grotesk", sans-serif;
+  font-size:15px;
+  font-weight:600;
+  color:var(--ink);
+  letter-spacing:0.4px;
+  margin-top:6px;
+}
+.sub{
+  margin:0;
+  color:var(--mute);
+  font-size:14px;
+}
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+button{
+  border-radius:999px;
+  border:1px solid transparent;
+  padding:10px 18px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:"Space Grotesk", sans-serif;
+  letter-spacing:0.2px;
+}
+button:disabled{
+  cursor:not-allowed;
+  opacity:0.6;
+}
+button.primary{
+  background:linear-gradient(120deg, var(--sun), var(--sun-deep));
+  color:var(--night);
+  box-shadow:0 10px 20px rgba(217,143,23,0.35);
+}
+button.fab{
+  position:fixed;
+  right:18px;
+  bottom:20px;
+  z-index:20;
+  padding:14px 20px;
+  font-size:15px;
+}
+button.fab:disabled{
+  box-shadow:none;
+}
+button.ghost{
+  background:transparent;
+  border-color:var(--border);
+  color:var(--ink);
+}
+.status{
+  font-size:13px;
+  font-weight:600;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(246,197,63,0.18);
+  color:var(--ink);
+}
+.status[data-type="error"]{
+  background:rgba(212, 84, 60, 0.15);
+  color:#8c2d1d;
+}
+.status[data-type="success"]{
+  background:rgba(32, 135, 84, 0.15);
+  color:#1b5a39;
+}
+.menu-list{
+  display:grid;
+  gap:14px;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+}
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,0.6);
+}
+.image-preview{
+  border-radius:14px;
+  padding:0;
+  width:100%;
+  height:120px;
+  margin-top:6px;
+  background-color:rgba(0,0,0,0.04);
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  font-family:"Space Grotesk", sans-serif;
+  font-size:14px;
+  font-weight:600;
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.image-preview.is-empty{
+  border:1px dashed rgba(0,0,0,0.2);
+}
+.card-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.card-title{
+  font-family:"Space Grotesk", sans-serif;
+  font-size:18px;
+  margin:0;
+  letter-spacing:0.4px;
+}
+.field{
+  display:grid;
+  gap:6px;
+  margin-bottom:12px;
+}
+.field label{
+  font-size:12px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--mute);
+}
+.field input,
+.field textarea{
+  border-radius:12px;
+  border:1px solid var(--border);
+  padding:10px 12px;
+  font-size:15px;
+  font-family:"IBM Plex Sans", sans-serif;
+  background:white;
+}
+.field textarea{
+  resize:vertical;
+  min-height:60px;
+}
+.day-value{
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(0,0,0,0.04);
+  font-weight:600;
+  font-size:15px;
+  color:var(--ink);
+}
+.footer{
+  text-align:center;
+  color:var(--mute);
+  font-size:12px;
+}
+.hint{margin:0}
+.noscript{
+  margin:0 16px 20px;
+  padding:12px 14px;
+  background:rgba(212, 84, 60, 0.15);
+  border-radius:12px;
+  color:#8c2d1d;
+  font-weight:600;
+  font-size:13px;
+}
+
+@media (min-width: 720px){
+  .app{max-width:760px;margin:0 auto}
+}

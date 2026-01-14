@@ -1,0 +1,16 @@
+{
+  "name": "Menu Editor",
+  "short_name": "Menu",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f1e6",
+  "theme_color": "#f6c53f",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

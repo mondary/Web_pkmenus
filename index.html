@@ -313,7 +313,11 @@
     /********************
      * CONFIG A MODIFIER
      ********************/
-    let MENU = [
+    const REMOTE_MENU_URL = "backend/menu.json";
+    const REMOTE_MENU_ENABLED = Boolean(REMOTE_MENU_URL);
+    const REMOTE_MENU_BUST_CACHE = true;
+
+    const DEFAULT_MENU = [
       { day: "Lundi",    title: "Tagliatelles aux boulettes", details: "Sauce tomate, creme, gruyere" },
       { day: "Mardi",    title: "Fajitas", details: "Poulet, poivrons, oignon, tortillas" },
       { day: "Mercredi", title: "Gnocchis", details: "Jambon ou lardons, sauce tomate ou creme" },
@@ -322,20 +326,58 @@
       { day: "Samedi",   title: "Burgers maison", details: "Pains, viande, fromage, frites" },
       { day: "Dimanche", title: "Cuisses de poulet roties", details: "Pommes de terre, haricots verts" }
     ];
-
-    // Load persisted menu
-    const savedMenu = localStorage.getItem('menu_dashboard_state');
-    if (savedMenu) {
-      try {
-        const parsed = JSON.parse(savedMenu);
-        if (Array.isArray(parsed) && parsed.length === MENU.length) {
-          MENU = parsed;
-        }
-      } catch(e) { console.error("Failed to load saved menu", e); }
-    }
+    let MENU = DEFAULT_MENU.map(item => ({ ...item }));
 
     function saveMenuState() {
+      if (REMOTE_MENU_ENABLED) return;
       localStorage.setItem('menu_dashboard_state', JSON.stringify(MENU));
+    }
+
+    function normalizeMenu(data) {
+      if (!Array.isArray(data) || data.length === 0) return null;
+      const cleaned = [];
+      for (const item of data) {
+        if (!item || typeof item !== "object") return null;
+        const day = typeof item.day === "string" ? item.day.trim() : "";
+        const title = typeof item.title === "string" ? item.title.trim() : "";
+        if (!day || !title) return null;
+        const image = typeof item.image === "string" ? item.image.trim() : "";
+        cleaned.push({ day, title, details: "", image });
+      }
+      return cleaned;
+    }
+
+    function loadLocalMenuState() {
+      const savedMenu = localStorage.getItem('menu_dashboard_state');
+      if (savedMenu) {
+        try {
+          const parsed = JSON.parse(savedMenu);
+          const normalized = normalizeMenu(parsed);
+          if (normalized) MENU = normalized;
+        } catch(e) { console.error("Failed to load saved menu", e); }
+      }
+    }
+
+    async function loadMenu() {
+      if (!REMOTE_MENU_ENABLED || typeof fetch !== "function") {
+        loadLocalMenuState();
+        return;
+      }
+      try {
+        let url = REMOTE_MENU_URL;
+        if (REMOTE_MENU_BUST_CACHE) {
+          url += (url.includes("?") ? "&" : "?") + "ts=" + Date.now();
+        }
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) throw new Error("Remote menu request failed");
+        const data = await response.json();
+        const normalized = normalizeMenu(data);
+        if (!normalized) throw new Error("Invalid remote menu format");
+        MENU = normalized;
+      } catch (e) {
+        console.warn("Falling back to local menu", e);
+        MENU = DEFAULT_MENU.map(item => ({ ...item }));
+      }
     }
 
     const SUGGESTIONS = [
@@ -346,9 +388,9 @@
     ];
 
     const PHOTOS = [
-      { src: "photos/20251212_071241.jpg", caption: "Photo 1" },
-      { src: "photos/IMG-20251202-WA0020.jpg", caption: "Photo 2" },
-      { src: "photos/IMG-20251225-WA0053.jpg", caption: "Photo 3" }
+      { src: "pwa/photos/20251212_071241.jpg", caption: "Photo 1" },
+      { src: "pwa/photos/IMG-20251202-WA0020.jpg", caption: "Photo 2" },
+      { src: "pwa/photos/IMG-20251225-WA0053.jpg", caption: "Photo 3" }
     ];
 
     const SLIDE_SECONDS = 8;
@@ -550,34 +592,44 @@
         el.innerHTML = `
           <div class="tile-day">${escapeHtml(item.day)}</div>
           <div class="tile-title">${escapeHtml(item.title)}</div>
-          <div class="tile-details">${escapeHtml(item.details || "")}</div>
           <button class="edit-btn" title="Modifier"><i class="fas fa-pen"></i></button>
         `;
         el.querySelector('.edit-btn').addEventListener('click', handleEditClick);
         menuGrid.appendChild(el);
 
-        // Fetch and append images
-        fetchImage750g(item.title).then(urls => {
-          if (urls && urls.length > 0) {
-            el.dataset.images = JSON.stringify(urls);
-            
-            // Restore preference
-            const prefs = JSON.parse(localStorage.getItem('menu_image_prefs') || "{}");
-            const preferredUrl = prefs[item.title];
-            let startIndex = 0;
-            if (preferredUrl && urls.includes(preferredUrl)) {
-              startIndex = urls.indexOf(preferredUrl);
+        if (item.image) {
+          el.dataset.images = JSON.stringify([item.image]);
+          el.dataset.currentImageIndex = 0;
+
+          const imgEl = document.createElement("img");
+          imgEl.className = "tile-bg";
+          imgEl.src = item.image;
+          imgEl.onload = () => imgEl.classList.add("loaded");
+          el.appendChild(imgEl);
+        } else {
+          // Fetch and append images
+          fetchImage750g(item.title).then(urls => {
+            if (urls && urls.length > 0) {
+              el.dataset.images = JSON.stringify(urls);
+              
+              // Restore preference
+              const prefs = JSON.parse(localStorage.getItem('menu_image_prefs') || "{}");
+              const preferredUrl = prefs[item.title];
+              let startIndex = 0;
+              if (preferredUrl && urls.includes(preferredUrl)) {
+                startIndex = urls.indexOf(preferredUrl);
+              }
+              
+              el.dataset.currentImageIndex = startIndex;
+              
+              const imgEl = document.createElement("img");
+              imgEl.className = "tile-bg";
+              imgEl.src = urls[startIndex];
+              imgEl.onload = () => imgEl.classList.add("loaded");
+              el.appendChild(imgEl);
             }
-            
-            el.dataset.currentImageIndex = startIndex;
-            
-            const imgEl = document.createElement("img");
-            imgEl.className = "tile-bg";
-            imgEl.src = urls[startIndex];
-            imgEl.onload = () => imgEl.classList.add("loaded");
-            el.appendChild(imgEl);
-          }
-        });
+          });
+        }
       });
 
       // Suggestions Tile
@@ -729,8 +781,13 @@
       setTimeout(() => location.reload(), AUTO_REFRESH_SECONDS * 1000);
     }
 
-    renderMenu();
-    setupSlideshow();
+    async function init() {
+      await loadMenu();
+      renderMenu();
+      setupSlideshow();
+    }
+
+    init();
   </script>
 </body>
 </html>
