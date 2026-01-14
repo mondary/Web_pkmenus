@@ -257,20 +257,27 @@
     }
     @media (max-width: 980px){
       .board{
-        grid-template-columns:0.36fr 0.64fr;
-        transform: scale(0.85);
-        transform-origin: top left;
-        width: calc(100% / 0.85);
-        height: calc(100% / 0.85);
+        grid-template-columns:1fr;
+        grid-template-rows:auto 1fr;
+        gap:12px;
       }
+      .side{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+      }
+      .side-photo{flex:1}
+      .side-bottom{
+        order:-1;
+        align-items:center;
+      }
+      .clock{font-size:54px}
+      .today{font-size:22px}
     }
     @media (max-width: 700px), (max-height: 720px){
-      .board{
-        transform: scale(0.7);
-        transform-origin: top left;
-        width: calc(100% / 0.7);
-        height: calc(100% / 0.7);
-      }
+      .board{gap:10px}
+      .clock{font-size:48px}
+      .today{font-size:20px}
     }
   </style>
 </head>

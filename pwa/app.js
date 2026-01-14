@@ -117,6 +117,7 @@ async function cycleImage(index) {
   item.image = options[currentIndex];
   markDirty();
   renderMenu();
+  await saveMenu();
 }
 
 function renderMenu() {
@@ -154,6 +155,9 @@ function renderMenu() {
       markDirty();
       renderMenu();
       setStatus(options.length ? "Photo mise a jour." : "Aucune photo trouvee.", options.length ? "success" : "error");
+      if (options.length) {
+        await saveMenu();
+      }
     });
     titleField.appendChild(titleLabel);
     titleField.appendChild(titleInput);
