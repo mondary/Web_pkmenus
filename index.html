@@ -283,6 +283,8 @@
       outline:none;
       text-align:left;
       vertical-align:top;
+      resize:none;
+      overflow:hidden;
     }
     @media (max-width: 980px){
       .board{
@@ -352,7 +354,7 @@
     </section>
   </div>
   <div class="editor" id="editor">
-    <input class="editor-input" id="editorInput" type="text" />
+    <textarea class="editor-input" id="editorInput" rows="2"></textarea>
   </div>
 
   <script>
@@ -375,8 +377,29 @@
     let MENU = DEFAULT_MENU.map(item => ({ ...item }));
 
     function saveMenuState() {
-      if (REMOTE_MENU_ENABLED) return;
+      if (REMOTE_MENU_ENABLED) {
+        saveMenuRemote();
+        return;
+      }
       localStorage.setItem('menu_dashboard_state', JSON.stringify(MENU));
+    }
+
+    async function saveMenuRemote() {
+      if (!REMOTE_MENU_ENABLED || typeof fetch !== "function") return;
+      try {
+        const payload = MENU.map(item => ({
+          day: item.day,
+          title: item.title,
+          image: item.image || ""
+        }));
+        await fetch("backend/save-menu.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn("Remote menu save failed", e);
+      }
     }
 
     function normalizeMenu(data) {
@@ -492,6 +515,7 @@
           if (suggTitleEl) {
             MENU[targetIndex].title = suggTitleEl.textContent;
             MENU[targetIndex].details = ""; // Reset details for new suggestion
+            MENU[targetIndex].image = "";
             
             // Clean up stored image preference for this day since it's a new dish
             const prefs = JSON.parse(localStorage.getItem('menu_image_prefs') || "{}");
@@ -505,12 +529,15 @@
           // Normal case: Swap title and details between the two objects in MENU array
           const tempTitle = MENU[draggedIndex].title;
           const tempDetails = MENU[draggedIndex].details;
+          const tempImage = MENU[draggedIndex].image;
           
           MENU[draggedIndex].title = MENU[targetIndex].title;
           MENU[draggedIndex].details = MENU[targetIndex].details;
+          MENU[draggedIndex].image = MENU[targetIndex].image;
           
           MENU[targetIndex].title = tempTitle;
           MENU[targetIndex].details = tempDetails;
+          MENU[targetIndex].image = tempImage;
           
           renderMenu();
           saveMenuState();
@@ -600,6 +627,7 @@
       const oldTitle = MENU[editorIndex].title;
       MENU[editorIndex].title = newTitle;
       MENU[editorIndex].details = "";
+      MENU[editorIndex].image = "";
 
       const prefs = JSON.parse(localStorage.getItem('menu_image_prefs') || "{}");
       delete prefs[oldTitle];
