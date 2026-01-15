@@ -1,0 +1,65 @@
+plugins {
+  id "com.android.application"
+}
+
+android {
+  namespace "com.pouark.pkmenus"
+  compileSdk 34
+
+  defaultConfig {
+    applicationId "com.pouark.pkmenus"
+    minSdk 21
+    targetSdk 34
+    versionCode 1
+    versionName "1.0"
+  }
+
+  def keystorePropertiesFile = rootProject.file("keystore/keystore.properties")
+  def keystoreProperties = new Properties()
+  if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+  }
+
+  signingConfigs {
+    release {
+      if (keystorePropertiesFile.exists()) {
+        storeFile file(keystoreProperties["storeFile"])
+        storePassword keystoreProperties["storePassword"]
+        keyAlias keystoreProperties["keyAlias"]
+        keyPassword keystoreProperties["keyPassword"]
+      }
+    }
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      signingConfig signingConfigs.release
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+}
+
+dependencies {
+}
+
+def releaseDir = rootProject.layout.projectDirectory.dir("../release")
+
+tasks.register("copyDebugApk", Copy) {
+  dependsOn "assembleDebug"
+  from("$buildDir/outputs/apk/debug/app-debug.apk")
+  into(releaseDir)
+  rename { "pkmenus-debug.apk" }
+}
+
+tasks.register("copyReleaseApk", Copy) {
+  dependsOn "assembleRelease"
+  from("$buildDir/outputs/apk/release/app-release.apk")
+  into(releaseDir)
+  rename { "pkmenus-release.apk" }
+}

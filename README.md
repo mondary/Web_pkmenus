@@ -80,7 +80,7 @@ $MENU_PATH = __DIR__ . "/menu.json";
 $WRITE_TOKEN = ""; // Optional: set a shared secret to protect writes.
 ```
 
-If you set a token, also set it in `frontend/app.js`:
+If you set a token, also set it in `pwa/app.js`:
 
 ```js
 const WRITE_TOKEN = "your-secret";
@@ -96,6 +96,38 @@ The TV display loads `menu.json` on each refresh. If the file is missing or inva
 -   **Storage**: Uses `localStorage` to persist your image selections.
 -   **Image Fetching**: Uses `api.codetabs.com` as a CORS proxy to scrape dish images from `750g.com` on the fly.
 -   **Fonts**: Uses Google Fonts (Bebas Neue, Work Sans).
+
+## Android TV APK
+
+An Android TV kiosk app is provided under `APPS/android-tv/`. It launches fullscreen and loads `https://menu.pouark.com` in a WebView, keeping the screen on.
+
+### Build (Android Studio)
+
+1. Open `APPS/android-tv/` in Android Studio.
+2. Let Gradle sync.
+3. Run or build an APK from the **app** module.
+
+### Release APK (signed)
+
+Generate the release keystore (one time) from `APPS/android-tv/keystore/`:
+
+```bash
+cd APPS/android-tv/keystore
+keytool -genkeypair -v \
+  -keystore pkmenus.jks \
+  -alias pkmenus \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -storepass 'rvyAtwfYwvWKD5VnQskTbBfq' \
+  -keypass 'rvyAtwfYwvWKD5VnQskTbBfq' \
+  -dname 'CN=pkmenus, OU=menu, O=pouark, L=NA, S=NA, C=FR'
+```
+
+Then build the release APK from Android Studio (or Gradle) using the **release** build type.
+
+### Configuration
+
+- URL: `APPS/android-tv/app/src/main/java/com/pouark/pkmenus/MainActivity.java` (`MENU_URL`).
+- Auto-refresh interval: `REFRESH_MINUTES` (set to `0` to disable).
 
 ## OpenSpec
 
